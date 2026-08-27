@@ -1,12 +1,22 @@
 import axios from 'axios';
 
-// Create an Axios instance using relative path '/api' which Vite proxies to http://localhost:8000
+// connect with deploy backend
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Create an Axios instance using relative path '/api' which Vite proxies to http://localhost:8000
+/* const api = axios.create({
+  baseURL: '/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+}); */
 
 // Interceptor to handle specific HTTP errors gracefully
 api.interceptors.response.use(
