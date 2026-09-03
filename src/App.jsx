@@ -13,8 +13,15 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
+// Default welcome message shown in the chat when there is no prior history.
+// This is purely visual and must NOT be sent to the backend as chat context.
+const WELCOME_MESSAGE =
+  '¡Hola! 👋 Aún no has subido ningún documento. Por favor, dirígete al panel de carga (desliza hacia arriba o busca la sección de carga) y sube un archivo PDF para que podamos empezar a interactuar.';
+
 export default function App() {
-  const [messages, setMessages] = useState([]); // [{ user: string, ai: string }]
+  const [messages, setMessages] = useState([
+    { user: '', ai: WELCOME_MESSAGE },
+  ]); // [{ user: string, ai: string }]
   const [documents, setDocuments] = useState([]); // string[]
   const [isUploading, setIsUploading] = useState(false);
   const [isBotThinking, setIsBotThinking] = useState(false);
@@ -93,17 +100,21 @@ export default function App() {
 
   const handleResetSuccess = () => {
     setDocuments([]);
-    setMessages([]);
+    // Reset to the default welcome message so the user is re-guided
+    setMessages([{ user: '', ai: WELCOME_MESSAGE }]);
   };
 
   const handleSendMessage = async (userPrompt) => {
     if (!userPrompt || isBotThinking) return;
 
-    // Build history parameter from previous turns
-    const historial = messages.map((m) => ({
-      user: m.user,
-      ai: m.ai,
-    }));
+    // Build history parameter from previous turns.
+    // The welcome message (empty user) is visual-only and is excluded.
+    const historial = messages
+      .filter((m) => m.user)
+      .map((m) => ({
+        user: m.user,
+        ai: m.ai,
+      }));
 
     // Add user message immediately
     setIsBotThinking(true);
@@ -150,7 +161,8 @@ export default function App() {
 
   const handleClearChat = () => {
     if (messages.length > 0) {
-      setMessages([]);
+      // Keep the default welcome message as the visual placeholder
+      setMessages([{ user: '', ai: WELCOME_MESSAGE }]);
     }
   };
 
